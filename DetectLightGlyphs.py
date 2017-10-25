@@ -5,8 +5,8 @@ raw = cv2.imread("images/test3.jpg")
 
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
 
-lower = numpy.array([10 , 5, 110])
-upper = numpy.array([150, 150 ,150])
+lower = numpy.array([0 , 0, 70])
+upper = numpy.array([120, 140 ,140])
 
 mask = cv2.inRange(hsv, lower, upper)
 kernel = numpy.ones((5,5), numpy.uint8)
