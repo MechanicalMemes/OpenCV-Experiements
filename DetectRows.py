@@ -2,7 +2,7 @@ import cv2
 import numpy
 
 #Load Test Image
-raw = cv2.imread("row2.jpg")
+raw = cv2.imread("images/row2.jpg")
 
 #Convert to HSV for color filtering
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
