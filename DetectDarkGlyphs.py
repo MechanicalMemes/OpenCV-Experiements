@@ -23,7 +23,7 @@ cv2.drawContours(raw,contours,-1, (0,0,255), 2)
 
 for c in contours:
     cnt = c
-    if cv2.contourArea(c) >= 500:
+    if cv2.contourArea(c) >= 1000:
         x, y, w, h = cv2.boundingRect(cnt)
 
         if 1 - numpy.abs(w/h) < 0.5 :
@@ -43,7 +43,7 @@ result = int(x + (w/2))
 cv2.rectangle(raw,(x,y),(x+w,y+h),(0,255,0),2)
 cv2.putText(raw, "Chosen" , (x + 10,y + int(h/2) - 40), cv2.FONT_HERSHEY_COMPLEX, 0.8, (0,255,0), 2)
 
-cv2.putText(raw, "RESULT: " + str(result), (result,30),0,1,(0,255,0), 1);
+cv2.putText(raw, "RESULT: " + str(result), (result,30),0,1,(0,255,0), 1)
 cv2.line(raw,(result,0), (result, 1000), (0,255,0), 3)
 
 cv2.imshow("Raw", raw)
