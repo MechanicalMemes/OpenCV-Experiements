@@ -1,7 +1,7 @@
 import cv2
 import numpy
 
-raw = cv2.imread("images/test3.jpg")
+raw = cv2.imread("images/test5.jpg")
 
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
 
@@ -23,10 +23,13 @@ cv2.drawContours(raw,contours,-1, (0,0,255), 2)
 
 for c in contours:
     cnt = c
+    peri = cv2.arcLength(c, True)
+    approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+
     if cv2.contourArea(c) >= 1000:
         x, y, w, h = cv2.boundingRect(cnt)
 
-        if 1 - numpy.abs(w/h) < 0.5 :
+        if len(approx) == 4 :
             if y > 10:
 
                 cv2.putText(raw, "Cube" + str(x), (x + 20, y + int(h / 2)), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))

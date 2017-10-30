@@ -1,15 +1,15 @@
 import cv2
 import numpy
 
-raw = cv2.imread("images/test3.jpg")
+raw = cv2.imread("images/test2.jpg")
 
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
 
-lower = numpy.array([0 , 0, 70])
-upper = numpy.array([120, 140 ,140])
+lower = numpy.array([15 , 0, 133])
+upper = numpy.array([190, 30 ,159])
 
 mask = cv2.inRange(hsv, lower, upper)
-kernel = numpy.ones((5,5), numpy.uint8)
+kernel = numpy.ones((3,3), numpy.uint8)
 mask = cv2.erode(mask, kernel)
 mask = cv2.dilate(mask, kernel)
 
@@ -25,8 +25,9 @@ for c in contours:
     cnt = c
     if cv2.contourArea(c) >= 500:
         x, y, w, h = cv2.boundingRect(cnt)
-
-        if 1 - numpy.abs(w/h) < 0.5 :
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+        if len(approx) == 4 :
             if y > 10:
 
                 cv2.putText(raw, "Cube" + str(x), (x + 20, y + int(h / 2)), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 0, 0))
