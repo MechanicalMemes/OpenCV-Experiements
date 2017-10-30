@@ -2,14 +2,14 @@
 import numpy
 import cv2
 #Load Test Image
-raw = cv2.imread("images/row3.jpg")
+raw = cv2.imread("images/row6.jpg")
 
 height, width = raw.shape[:2]
 #Convert to HSV for color filtering
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
 
 #Prepare a kernal ERODE/DIALTE
-kernel = numpy.ones((4,12), numpy.uint8)
+kernel = numpy.ones((4,4), numpy.uint8)
 
 #Erode, Dilate, and blur to clean the image up
 hsv = cv2.erode(hsv, kernel)
@@ -18,7 +18,7 @@ hsv = cv2.blur(hsv, (6,6))
 
 
 #Set the HSV color rang to filter out
-lower = numpy.array([90, 135, 25]) #Darker Blue Range
+lower = numpy.array([90, 105, 25]) #Darker Blue Range
 upper = numpy.array([130,250,150]) #Lighter Blue Range
 
 #mask out all colors that fall outside the range above
@@ -28,7 +28,7 @@ mask = cv2.inRange(hsv, lower, upper)
 #crypto box that are split up by the white tape.
 #In this case we are allowing the joing along the Y axis to be high.s
 
-structure = cv2.getStructuringElement(cv2.MORPH_RECT, (20,200))
+structure = cv2.getStructuringElement(cv2.MORPH_RECT, (10,200))
 mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, structure)
 
 im2, contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -53,12 +53,16 @@ for c in contours:
         cv2.putText(raw, "Ratio: " + str(round(ratio, 3)), (int(x) - 10, int(y) + 20), 0, 0.4, (0, 255, 255), 1)
         cv2.putText(raw, "Angel: " + str(round(angle, 3)), (int(x) - 10, int(y) + 35), 0, 0.4, (0, 255, 255), 1)
         cv2.putText(raw, "Area: " + str(round(cv2.contourArea(cnt), 3)), (int(x) - 10, int(y) + 50), 0, 0.4,(0, 255, 255), 1)
-        cv2.drawContours(raw, [box], 0, (0, 0, 255), 2)
+
         if ratio > 3: #Check to see if the box is tall
             boxes.append((x, y, w, h)) #If all true add the box to array
             cv2.putText(raw, "Accepted!", (int(x) - 10, int(y) + -50), 0, 0.5, (0, 255, 0), 1)
+            cv2.circle(raw, (int(x), int(y)), 5, (0, 255, 0), 3)
+            cv2.drawContours(raw, [box], 0, (0, 255, 0), 2)
         else:
             cv2.putText(raw, "Rejected!" , (int(x) - 10, int(y) + -50), 0, 0.5,(0, 0, 255), 1)
+            cv2.circle(raw, (int(x), int(y)), 5, (0, 0, 255), 3)
+            cv2.drawContours(raw, [box], 0, (0, 0, 255), 2)
 
 
 
@@ -78,7 +82,7 @@ def drawSlot(slot):
     leftX = leftRow[0] #Get the X Coord
     rightX = rightRow[0] #Get the X Coord
 
-    cv2.circle(raw,(int(leftRow[0]), int(leftRow[1])) , 5, (0, 0,255), 3)
+
 
 
     drawX = int((rightX - leftX) / 2) + leftX #Calculate the point between the two
@@ -88,7 +92,7 @@ def drawSlot(slot):
 
 #Draw Slots
 print(len(boxes))
-if True:
+if len(boxes ) >=3:
     left = drawSlot(0)
     center = drawSlot(1)
     right = drawSlot(2)
@@ -102,6 +106,14 @@ if True:
     cv2.putText(raw, "Right", (right[0] - 10, right[1] - 20), 0,0.8, (0,255,255),2)
     cv2.circle(raw,right, 5,(0,255,255), 3);
 
+    bottomCenter = (int(width/2),int(height))
+    cv2.line(raw, bottomCenter,left, (255,0,0), 4)
+
+    cv2.line(raw, bottomCenter, (bottomCenter[0], left[1]), (255, 255, 255), 3)
+
+    distanceBetween = bottomCenter[0] - left[0]
+
+    cv2.putText(raw, str(distanceBetween),bottomCenter,0,1, (255,255,255))
 
 
 cv2.imshow("Raw", raw)
