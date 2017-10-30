@@ -2,7 +2,7 @@ import cv2
 import numpy
 
 #Load Test Image
-raw = cv2.imread("images/row2.jpg")
+raw = cv2.imread("images/row3.jpg")
 
 #Convert to HSV for color filtering
 hsv = cv2.cvtColor(raw,cv2.COLOR_BGR2HSV)
@@ -26,7 +26,7 @@ mask = cv2.inRange(hsv, lower, upper)
 #crypto box that are split up by the white tape.
 #In this case we are allowing the joing along the Y axis to be high.s
 
-structure = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (40,100))
+structure = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (40,300))
 mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, structure)
 
 #Find Contours
