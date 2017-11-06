@@ -2,7 +2,7 @@
 import numpy
 import cv2
 #Load Test Image
-raw = cv2.imread("images/row6.jpg")
+raw = cv2.imread("images/row1.jpg")
 
 height, width = raw.shape[:2]
 #Convert to HSV for color filtering
@@ -96,6 +96,7 @@ if len(boxes ) >=3:
     left = drawSlot(0)
     center = drawSlot(1)
     right = drawSlot(2)
+
 
     cv2.putText(raw, "Left", (left[0] - 10, left[1] - 20), 0,0.8, (0,255,255),2)
     cv2.circle(raw,left, 5,(0,255,255), 3);
