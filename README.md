@@ -25,6 +25,21 @@ many diffrent examples, in diffrent lighting and enviroments, perfect for testin
 ### Running
 Simple [Download](https://drive.google.com/drive/folders/0Bzk9icjq-l3JQVdYM0ZuUTNXWlE?usp=sharing) it and extract the files into `images/`. Then run the scripts either via your IDE or `python [script]`. Press `q` to cycle to the next image. `ctrl + c` inside your terminal to close the script (or _stop button_ in PyCharm)
 
+
+## Detectors
+
+### Glyph Detector (Working 90%)
+This is a detector that uses a mix of filters and canny edge detection that is fed into FindContours. Then each result is scored based on Ratio, Area,
+Distance from Bottom-Center of the screen, and soon color. The top scoring result is returned. The value that will be returned inside DogeCV will be a distance
+from Center Screen on the X Axis. This can be fed into the bot to tell it which direction to turn.
+
+### Cryptobox Detector (Being Cleaned up)
+This detector finds the position of each Colloumn inside the cryptobox. It currently used HSV values to do this so color and lighting will effect it. Im looking
+to other ways of doing this. This also currently requires the full cryptobox to be in view. Im also finding a way to change this however it may take a while. I recommend using this as a one-time reading. Find the cryptobox positon, align or find the values to align, then move. 
+
+### Jewel Detector (Being Cleaned up)
+This detector finds the orientations of the two Jewels, returning which one is left or right. This is HSV based so lighting and color will effect this detector.
+
 ## `legacy` folder
 This are old scripts I'm currently porting over and cleaning up. This do not support the image set above and most only read one image at a time.
 
