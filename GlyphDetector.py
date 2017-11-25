@@ -7,27 +7,30 @@ import glob
 # for easy exerpiementing. - Alex "Phil" Carter from FTC Team 7195,6179 and Disnode Team :)
 
 # Settings
-imagePath = "./images/glyphs"
-imageSize = (1280, 720)
+imagePath = "./images/glyphs/robot_level" # Path to Images
+imageSize = (1280, 720) # Resize Images to this
 
-debug_show_preprocessed = False
-debug_show_filtered = False
-debug_draw_stats = False
-debug_draw_center = False
-debug_draw_rects = False
+debug_show_preprocessed = False  # Show the PreProcessed Image
+debug_show_filtered = False  # Show the Filtered Image
+debug_draw_stats = False # Show Stats for Each Rectangle (Very Spammy)
+debug_draw_center = False  # Draw Center Line on the screen
+debug_draw_rects = False # Draw all found rectables
 
+
+# Weights for scoring
 score_ratio_weight = 0.9
 score_distance_x_weight = 1
 score_distance_y_weight = 1.2
 score_area_weight = 3
 
+# Process and Find Glyphs
 
 def process_image(input_mat):
     output = input_mat
     output = cv2.resize(output, imageSize)
     processed = preprocess(input_mat)
     filtered = apply_filters(processed)
-    cv2.imshow("Filtered", filtered)
+
     countor_image, cnts, hq = cv2.findContours(filtered.copy(), cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     cnts = sorted(cnts, key=cv2.contourArea, reverse=True)[:10]
@@ -139,9 +142,9 @@ def preprocess(input_mat):
 
     return grey
 
-
+# Applyes Filters to the images
 def apply_filters(input_mat):
-    blurred = cv2.GaussianBlur(input_mat, (3, 3), 1)
+    blurred = cv2.GaussianBlur(input_mat, (3, 3), 1)  # Jack-ify the image
     blurred = cv2.bilateralFilter(blurred, 11, 17, 17)
     edges = cv2.Canny(blurred, 20, 50)
     structure = cv2.getStructuringElement(cv2.MORPH_RECT, (45, 45))
