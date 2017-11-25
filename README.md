@@ -1,6 +1,11 @@
 # OpenCV-Experiements
 My Repo of OpenCV Expermenting.
 
+##Running Examples
+### Requirments
+ - NumPy
+ - OpenCV
+ - Images
 
 ##IDE
 I recommend using PyCharm for running this only for the fact thats what
