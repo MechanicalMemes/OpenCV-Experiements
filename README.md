@@ -1,9 +1,14 @@
 # OpenCV-Experiements
-My Repo of OpenCV Expermenting.
+My Repo of OpenCV Expermenting and Development
 
 ## Disclaimer
 This code is not meant for production use, and I'm sure isnt the best way to do these tasks. Im
 still learning and just need a place to experiement with ideas. Ill do my best to comment and explain my thinking however!
+
+## Doge CV
+This is the playground and development repo for [DogeCV](https://github.com/GTHSRobotics/DogeCV), my easy to use FTC Vision Lib. If you are looking for Vision, see that repository. This repo is mostly for those
+who want to experiment and develop with computer vision this year.
+*DOGE CV STILL IN DEVELOPMENT*
 
 ## Running Examples
 
