@@ -6,22 +6,29 @@ import glob
 # but it some how "works". So Enjoy! Keep in mind this will be ported to an Android Library shortly. This is mearly
 # for easy exerpiementing. - Alex "Phil" Carter from FTC Team 7195,6179 and Disnode Team :)
 
+# SCORING
+# Each parameter returns a normalized float between 0-1
+# We then calculate the punishment. If 1.0 is bad (in the case of Distance, the further away an object
+# is the worst it should be weighted) we subtract this punishment from 1, resulting in 0. Multiply this by
+# the weight so we can tune and multiply this to the score.
+# If 1.0 is good we just directly weigh it and multiply.
+
 # Settings
-imagePath = "./images/glyphs/robot_level" # Path to Images
-imageSize = (1280, 720) # Resize Images to this
+imagePath = "./images/glyphs/robot_level"  # Path to Images
+imageSize = (1280, 720)  # Resize Images to this
 
 debug_show_preprocessed = False  # Show the PreProcessed Image
 debug_show_filtered = False  # Show the Filtered Image
-debug_draw_stats = False # Show Stats for Each Rectangle (Very Spammy)
+debug_draw_stats = True  # Show Stats for Each Rectangle (Very Spammy)
 debug_draw_center = False  # Draw Center Line on the screen
-debug_draw_rects = False # Draw all found rectables
-
+debug_draw_rects = True  # Draw all found rectables
 
 # Weights for scoring
-score_ratio_weight = 0.9
-score_distance_x_weight = 1
-score_distance_y_weight = 1.2
-score_area_weight = 3
+score_ratio_weight = 0.5
+score_distance_x_weight = 0.8
+score_distance_y_weight = 1
+score_area_weight = 0.4
+
 
 # Process and Find Glyphs
 
@@ -50,34 +57,44 @@ def process_image(input_mat):
 
         score = 100
 
-        # Ratio score calculation
+        # Ratio score calculation (1.0 is bad)
         distance_from_perfect = abs(1 - cube_ratio)
-        distance_from_perfect = distance_from_perfect * score_ratio_weight
-        score_ratio = 1 - distance_from_perfect
-        score_ratio = 100 * score_ratio
+        score_ratio_punishment = 1 - distance_from_perfect
+        score_ratio = score_ratio_punishment * score_ratio_weight
+        score = score * score_ratio
 
-        score = score + score_ratio
-
-        # Position score
+        # Position score (1.0 is bad)
         distance_from_center_x = (imageSize[0] / 2) - center_point[0]
         distance_from_center_y = (imageSize[1]) - center_point[1]
+        distance_from_center_x = distance_from_center_x
+        distance_from_center_y = distance_from_center_y
+        distance_from_center_x_normalized = abs(distance_from_center_x / imageSize[0])
+        distance_from_center_y_normalized = abs(distance_from_center_y / imageSize[1])
 
-        weight_distance_x = distance_from_center_x * score_distance_x_weight
-        weight_distance_y = distance_from_center_y * score_distance_y_weight
+        score_distance_x_punishment = 1 - distance_from_center_x_normalized
+        score_distance_x = score_distance_x_punishment * score_distance_x_weight
+        score_distance_y_punishment = 1 - distance_from_center_y_normalized
+        score_distance_y = score_distance_y_punishment * score_distance_y_weight
 
-        total_distance = abs(weight_distance_x) + abs(weight_distance_y)
-        score_distance = (total_distance / 10)
+        score = score * score_distance_x
+        score = score * score_distance_y
 
-        score = score - score_distance
+
+        # Area Scoring (1.0 is good)
+        areas = [cv2.contourArea(c) for c in cnts]
+        max_index = numpy.argmax(areas)
+        min_index = numpy.argmin(areas)
+
+        max_area = areas[max_index]
+        min_area = areas[min_index]
 
         area = cv2.contourArea(c)
+        area_normalized = (area / min_area) / (max_area / min_area)
+        score_area_punishment = area_normalized
+        score_area = score_area_punishment * score_distance_x_weight
+        score = score * score_area
 
-        score_area = (area / 1000) * score_area_weight
-
-        if area < 5000:
-            score_area = -500
-
-        score = score + score_area
+        # Choose Rect based on score
 
         detected_rects.append((x, y, w, h, score))
 
@@ -87,30 +104,27 @@ def process_image(input_mat):
         if chosen_rect[4] < score:
             chosen_rect = (x, y, w, h, score)
 
+        # Debug
+
         if debug_draw_rects:
-            cv2.circle(output, center_point, 5, (0, 255, 255), 3)
+            cv2.circle(output, center_point, 1, (0, 255, 255), 4)
             cv2.rectangle(output, (x, y), ((x + w), (y + h)), (255, 255, 9), 2)
         if debug_draw_stats:
             string_ratio = "Ratio %4.3f" % cube_ratio
-            cv2.putText(output, string_ratio, (x, center_point[1] - 15), 0, 0.5, (0, 255, 255), 1)
-
             string_area = "Area %4.3f" % area
-            cv2.putText(output, string_area, (x, center_point[1] - 30), 0, 0.5, (0, 255, 255), 1)
-
-            string_distance = "Distance %4.3f" % total_distance
-            cv2.putText(output, string_distance, (x, center_point[1] - 45), 0, 0.5, (0, 255, 255), 1)
-
-            string_area_score = "Area Score %4.3f" % score_area
-            cv2.putText(output, string_area_score, (x, center_point[1] + 20), 0, 0.5, (0, 255, 255), 1)
-
-            string_distance_score = "Distance Score %4.3f" % score_distance
-            cv2.putText(output, string_distance_score, (x, center_point[1] + 35), 0, 0.5, (0, 255, 255), 1)
-
-            string_ratio_score = "Ratio Score %4.3f" % score_ratio
-            cv2.putText(output, string_ratio_score, (x, center_point[1] + 50), 0, 0.5, (0, 255, 255), 1)
-
+            string_distance = "Distance %4.3f / %4.3f" % (distance_from_center_x_normalized , distance_from_center_y_normalized)
+            string_area_score = "AScore %4.3f" % score_area
+            string_distance_score = "DScore %4.2f / %4.2f" % (score_distance_x, score_distance_y)
+            string_ratio_score = "RScore %4.3f" % score_ratio
             string_score = "Score %4.3f" % score
-            cv2.putText(output, string_score, (x, center_point[1] + 70), 0, 0.7, (255, 255, 0), 1)
+
+            cv2.putText(output, string_ratio, (x + 5, y + 15), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_area, (x + 5, y + 30), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_distance, (x + 5, y + 45), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_area_score, (x + 5, y + 60), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_distance_score, (x + 5, y + 75), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_ratio_score, (x + 5, y + 90), 0, 0.35, (0, 255, 255), 1)
+            cv2.putText(output, string_score, (x + 5, y + 115), 0, 0.5, (255, 255, 0), 1)
 
     print(chosen_rect)
     x, y, w, h, score = chosen_rect
@@ -141,6 +155,7 @@ def preprocess(input_mat):
         cv2.imshow("PreProcessed", grey)
 
     return grey
+
 
 # Applyes Filters to the images
 def apply_filters(input_mat):
