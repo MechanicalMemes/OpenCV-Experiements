@@ -18,7 +18,7 @@ imagePath = "./images/glyphs/robot_level"  # Path to Images
 imageSize = (1280, 720)  # Resize Images to this
 
 debug_show_preprocessed = False  # Show the PreProcessed Image
-debug_show_filtered = False  # Show the Filtered Image
+debug_show_filtered = True  # Show the Filtered Image
 debug_draw_stats = True  # Show Stats for Each Rectangle (Very Spammy)
 debug_draw_center = False  # Draw Center Line on the screen
 debug_draw_rects = True  # Draw all found rectables

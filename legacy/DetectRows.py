@@ -2,7 +2,7 @@ import numpy
 import cv2
 
 # Load Test Image
-raw = cv2.imread("images/cryptorow3.jpg")
+raw = cv2.imread("../images/cryptoboxes/row1.jpg")
 
 height, width = raw.shape[:2]
 # Convert to HSV for color filtering
